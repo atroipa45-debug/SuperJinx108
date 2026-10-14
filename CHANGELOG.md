@@ -1,0 +1,59 @@
+# Changelog
+
+## v1.0.1
+- Fixed: nginx could not start on Railway (a buffer size line in ws.inc), so the panel showed "Application failed to respond".
+- nginx doctor: if nginx ever refuses its config, the tuning lines are dropped and, if needed, a simple safe config is used, so the panel always opens
+- CHOST edge: a built-in backup front door; if nginx can not start at all (6 quick failures or a config it never accepts), it serves the panel, sub links and the 6 configs on the same ports
+- Database doctor: the database is checked before every start; a safe copy is kept every 6 hours and before every update (last 4 on the volume); a damaged database is replaced by the last good copy, a busy one is never touched
+- Core guard: if the Xray core stops answering, only the core is started again
+- Disk guard: when the volume is almost full, old copies and leftover files are cleared
+- The sales bot process starts only after a token is saved and the bot is turned on (checked every 3 s), so small plans keep that memory free
+- Lighter watcher: every 10 s only the newest 30 users are checked for a missing group (all users every few minutes)
+- Memory guard counts only real working memory (file cache is ignored), with a 10 minute rest after a refresh, so nothing is ever restarted without need
+- Start self test: 25 seconds after start the log shows whether the panel is reachable on every container address (IPv4 and IPv6) and port, the exact way Railway reaches it
+- The panel answers on 8080, Railway's own port and the usual web ports (80, 3000, 5000, 8888), so a different domain target port never shows Railway's error page
+- Memory guard: on small plans the doctor frees memory (sales bot first, then the panel process) before Railway could stop the service; Python and the core use less memory, nginx runs at most 2 workers
+- Start log shows ports, CPUs and the memory limit of the service
+- Opening the panel right after a deploy shows a calm self-refreshing "the panel is starting" page instead of a raw 502 error
+- The bare domain opens the panel directly (no more Not Found page at the root address)
+- Before every nginx start each listening address is really tried; only an address the container can never open is dropped (IPv6 missing, a port not allowed), "already in use" never drops anything and 8080 is always kept
+- Back button entries keep the panel router state, so the panel's own navigation never breaks
+- Railway: Xray outbound works with IPv4 and IPv6 in every region; no dependency on geo files; nginx and the core use only the CPUs the service really has (Metal regions no longer start dozens of workers)
+- HTTPUpgrade configs without early data, so half of the configs never depend on it
+- GitHub page redesigned: cinematic deploy intro, live world map of the 4 Railway regions, animated panel, subscription page and sales bot
+- Railway: no start step can stop the deploy any more (certificate, config paths and nginx settings all have a safe fallback)
+- Config paths are written automatically if they are missing
+- Back button of the phone or browser closes the open CHOST menu, dialog, page or QR sheet first (never leaves the panel by surprise); every dialog closes with X, Cancel, the background or Escape; menus close with a tap outside, Escape or scrolling
+- Spelling: «سازنده‌ی پنل»، «باقی‌مانده»
+- Build uses the same proven layout as the original Railway package; at start the panel folder and its Python (also a .venv) are found automatically
+- CHOST doctor: checks configs, domain, subscription, core, panel, nginx and the bot all the time, repairs only the broken part and tells the bot admins in Telegram
+- No more service restarts: every part runs under its own supervisor and is started again in place in a few seconds; database updates are never interrupted
+- Railway: answers on 8080 and on the port Railway gives the service, so the domain and the health check pass in every region; nginx never stops the deploy because of IPv6
+- Panel API calls survive PasarGuard route spelling changes (trailing slash)
+- Configs always reach the subscription: the domain is picked up live (also when it is generated after the deploy), users saved without a group get all 6 configs, the subscription page loads the links from the panel if the page itself has none
+- Works the same on all 4 Railway regions
+- Phone menu (three lines): CHOST pages in every copy of the menu, the menu no longer changes between opens, the header stays visible, every CHOST page has a Back button
+- Language: no more jumping between Persian and English when the menu is closed
+- The creator card never covers the panel's own dialogs (creating users is never blocked) and shows once per login
+- Faster configs: larger proxy buffers, TCP Fast Open on the way out
+- New GitHub page: animated hero, one-brand showcase
+
+## v1.0.0
+- CHOST Panel: PasarGuard + Xray core + nginx in one Railway service (port 8080)
+- Zero-touch setup: owner, core, 6 configs, hosts on the Railway domain, 2 groups, 10 templates, reseller role
+- Two groups: 𝗖𝗛𝗢𝗦𝗧 VIP (Turbo, Stream, Ultra) and 𝗖𝗛𝗢𝗦𝗧 GAME (Gaming, Call, Stable)
+- Config names use clean symbols only (✦ for VIP, ◆ for GAME); older lightning-bolt names are still detected by the subscription page
+- 6 really different configs: VLESS-WS, VMess-WS, VLESS-HTTPUpgrade, Trojan-WS, all TLS 443 with early data
+- New CHOST subscription page: liquid gold usage orb, live countdown, real ping test, auto device detection (phone / desktop), one-tap import, built-in QR, Persian and English
+- Works in every Railway region: listens on IPv4 and IPv6 (auto IPv4-only fallback), longer start-up grace for slow regions, region shown in the logs
+- Sidebar "پنل نمایندگی" (owner only): a native page inside the panel with stats, search, table / mobile cards and row actions; create reseller panels with a data quota, top up or set quota, change password, enable/disable, delete; login info ready to copy
+- Login page "دسترسی مالک": new owner key dialog (CH-XXXX-XXXX-XXXX, 5 minutes, one use, paste button, password strength, any password from 4 characters, brute-force lock)
+- Bot wallet: card-to-card top up, instant buy/renew from balance, automatic refund on failure
+- Referral system: personal invite link, commission % to the inviter wallet
+- Admin user management in the bot: search by ID/username, add/subtract balance, direct message, ban/unban
+- Faster bot start (settings apply within seconds); fixed admin menu and back buttons
+- Telegram sales bot: sidebar page "ربات تلگرام" (token + admin IDs, live status, sales numbers, test message). In the bot: plans, prices, card number, texts, channel + force join, pending receipts, broadcast, open/close sales. Users: buy, card-to-card receipt, auto-created subscription, renew, my subscriptions, help, support
+- PasarGuard donation popup and "Support us" menu item removed; a CHOST creator card with the official channel (@CHOST543) shows once per login
+- Bot: discount codes (percent, usage cap, once per user), one-time free test account, renewal reminders (low data / 3 days left), full daily backup to the admins (panel DB + bot DB + install keys) and on-demand backup
+- Bilingual: every CHOST page, dialog, toast and server message follows the panel language (Persian / English) live, with the right text direction
+- Dashboard: clean menu, password change in the "امنیت حساب" page, 5-minute owner key, self-healing core and watchdog
